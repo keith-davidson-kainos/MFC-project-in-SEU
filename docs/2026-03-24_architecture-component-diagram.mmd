@@ -1,0 +1,53 @@
+flowchart LR
+    User[User]
+
+    subgraph DesktopApp[Atom-Molecule Desktop App]
+        AppBootstrap[App Bootstrap\nCalculate_atom]
+        MainUI[Main Atom UI + Expression Engine\nCalculate_atomDlg]
+        MoleculeUI[Molecule Launcher\nCalculate_molecule]
+
+        subgraph CalcModules[Specialized Calculator Dialogs]
+            Linear[Linear Solver]
+            Matrix[Matrix Calculator]
+            Complex[Complex Calculator]
+            Integrate[Integration Calculator]
+            Poly[Cubic Equation Solver]
+            BaseConv[Base Conversion]
+            TimeConv[Time Conversion]
+            DateConv[Date Conversion]
+            Prime[Prime Factorization]
+        end
+
+        AuxFeatures[Aux Features\nLogin + Draw + Leisure]
+        Resources[Resources & Config\nRC/Resource IDs/PCH]
+    end
+
+    subgraph Platform[Windows Platform]
+        MFC[MFC Framework + CRT]
+        WinAPI[Win32 APIs]
+        CommonCtrl[Common Controls Manifest]
+    end
+
+    subgraph ExternalArtifacts[External Files/Executables]
+        ReportDoc[Project Report Document]
+        DrawExe[MFC_DRAW.exe]
+        MineExe[Mine.exe]
+    end
+
+    User --> MainUI
+    AppBootstrap --> MainUI
+    MainUI --> MoleculeUI
+    MoleculeUI --> CalcModules
+    MainUI --> AuxFeatures
+
+    CalcModules --> Resources
+    MainUI --> Resources
+    MoleculeUI --> Resources
+
+    DesktopApp --> MFC
+    DesktopApp --> WinAPI
+    DesktopApp --> CommonCtrl
+
+    AuxFeatures -->|ShellExecute| ReportDoc
+    AuxFeatures -->|ShellExecute| DrawExe
+    AuxFeatures -->|ShellExecute| MineExe
