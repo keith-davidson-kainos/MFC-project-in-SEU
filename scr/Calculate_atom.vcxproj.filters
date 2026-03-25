@@ -75,6 +75,9 @@
     <ClInclude Include="Leisure.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="MatrixCore\MatrixCore.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Calculate_atom.cpp">
@@ -126,6 +129,9 @@
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="Leisure.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="MatrixCore\MatrixCore.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>

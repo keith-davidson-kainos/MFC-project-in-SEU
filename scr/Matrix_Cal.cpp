@@ -4,12 +4,83 @@
 #include "pch.h"
 #include "Calculate_atom.h"
 #include "Matrix_Cal.h"
+#include "MatrixCore/MatrixCore.h"
 #include "afxdialogex.h"
+
+#include <array>
 
 
 // Matrix_Cal 对话框
 
 IMPLEMENT_DYNAMIC(Matrix_Cal, CDialogEx)
+
+namespace {
+
+std::array<const char*, 4> BuildMatrixFields(const CString& v11, const CString& v12, const CString& v21, const CString& v22)
+{
+	return { v11.GetString(), v12.GetString(), v21.GetString(), v22.GetString() };
+}
+
+CString BuildMatrixMessage(const matrixcore::Matrix2x2& matrix)
+{
+	CString c11;
+	CString c12;
+	CString c21;
+	CString c22;
+	c11.Format(_T("%.4f"), matrix.m11);
+	c12.Format(_T("%.4f"), matrix.m12);
+	c21.Format(_T("%.4f"), matrix.m21);
+	c22.Format(_T("%.4f"), matrix.m22);
+
+	CString message(_T("结果：新矩阵：["));
+	message += c11 + CString(_T(", ")) + c12 + CString(_T("; ")) + c21 + CString(_T(", ")) + c22 + CString(_T("] "));
+	return message;
+}
+
+CString BuildScalarMessage(double value)
+{
+	CString x;
+	x.Format(_T("%.4f"), value);
+	CString message(_T("结果:"));
+	message += x;
+	return message;
+}
+
+CString BuildRankMessage(int rank)
+{
+	CString x;
+	x.Format(_T("%d"), rank);
+	CString message(_T("结果:"));
+	message += x;
+	return message;
+}
+
+CString BuildErrorMessage(const matrixcore::OperationResponse& response)
+{
+	CString message;
+	message.Format(_T("输入错误：%S"), response.message.c_str());
+	return message;
+}
+
+matrixcore::OperationRequest BuildRequest(matrixcore::MatrixOperation operation,
+	const CString& a11,
+	const CString& a12,
+	const CString& a21,
+	const CString& a22,
+	const CString& b11,
+	const CString& b12,
+	const CString& b21,
+	const CString& b22)
+{
+	matrixcore::OperationRequest request {
+		operation,
+		BuildMatrixFields(a11, a12, a21, a22),
+		BuildMatrixFields(b11, b12, b21, b22)
+	};
+	return request;
+}
+
+} // namespace
 
 Matrix_Cal::Matrix_Cal(CWnd* pParent /*=nullptr*/)
 	: CDialogEx(IDD_DIALOG7, pParent)
@@ -60,102 +131,88 @@ END_MESSAGE_MAP()
 
 void Matrix_Cal::OnBnClickedButton1()
 {
-	// TODO: 在此添加控件通知处理程序代码
 	UpdateData(TRUE);
-	double A11 = atof(a11);
-	double A12 = atof(a12);
-	double A21 = atof(a21);
-	double A22 = atof(a22);
-	double B11 = atof(b11);
-	double B12 = atof(b12);
-	double B22 = atof(b22);
-	double B21 = atof(b21);
-	double c11 = A11*B11+A12*B21;
-	double c12 = A21 * B11 + A22 * B21;
-	double c21 = A11* B12 + A12*B22;
-	double c22 = A21 * B12 + A22 * B22;
-	CString C11, C12, C21, C22;
-	C11.Format(_T("%.4f"), c11);
-	C12.Format(_T("%.4f"), c12);
-	C21.Format(_T("%.4f"), c21);
-	C22.Format(_T("%.4f"), c22);
-	CString M("结果：新矩阵：[");
-	M += C11 + CString(", ") + C12 + CString("; ") + C21 + CString(", ") + C22 + CString("] ");
-	MessageBox(M, _T("The answer"));
+	auto request = BuildRequest(matrixcore::MatrixOperation::Multiply, a11, a12, a21, a22, b11, b12, b21, b22);
+	auto response = matrixcore::Execute(request);
+	if (!response.ok) {
+		MessageBox(BuildErrorMessage(response), _T("The answer"));
+		return;
+	}
+
+	MessageBox(BuildMatrixMessage(response.matrix), _T("The answer"));
 	UpdateData(FALSE);
 }
 
 
 void Matrix_Cal::OnBnClickedButton2()
 {
-	// TODO: 在此添加控件通知处理程序代码
 	UpdateData(TRUE);
-	double A11 = atof(a11);
-	double A12 = atof(a12);
-	double A21 = atof(a21);
-	double A22 = atof(a22);
-	double B11 = atof(b11);
-	double B12 = atof(b12);
-	double B22 = atof(b22);
-	double B21 = atof(b21);
-	double c11 = A11 + B11;
-	double c12 = A12 + B12;
-	double c21 = A21 + B21;
-	double c22 = A22 + B22;
-	CString C11, C12, C21, C22;
-	C11.Format(_T("%.4f"), c11);
-	C12.Format(_T("%.4f"), c12);
-	C21.Format(_T("%.4f"), c21);
-	C22.Format(_T("%.4f"), c22);
-	CString M("结果：新矩阵：[");
-	M += C11 + CString(", ") + C12 + CString("; ") + C21 + CString(", ") + C22 + CString("] ");
-	MessageBox(M, _T("The answer"));
+	auto request = BuildRequest(matrixcore::MatrixOperation::Add, a11, a12, a21, a22, b11, b12, b21, b22);
+	auto response = matrixcore::Execute(request);
+	if (!response.ok) {
+		MessageBox(BuildErrorMessage(response), _T("The answer"));
+		return;
+	}
+
+	MessageBox(BuildMatrixMessage(response.matrix), _T("The answer"));
 	UpdateData(FALSE);
 }
 
 
 void Matrix_Cal::OnBnClickedButton4()
 {
-	// TODO: 在此添加控件通知处理程序代码
 	UpdateData(TRUE);
-	double A11 = atof(a11);
-	double A12 = atof(a12);
-	double A21 = atof(a21);
-	double A22 = atof(a22);
-	double B11 = atof(b11);
-	double B12 = atof(b12);
-	double B22 = atof(b22);
-	double B21 = atof(b21);
-	double c11 = A11 - B11;
-	double c12 = A12 - B12;
-	double c21 = A21 - B21;
-	double c22 = A22 - B22;
-	CString C11, C12, C21, C22;
-	C11.Format(_T("%.4f"), c11);
-	C12.Format(_T("%.4f"), c12);
-	C21.Format(_T("%.4f"), c21);
-	C22.Format(_T("%.4f"), c22);
-	CString M("结果：新矩阵：[");
-	M += C11 + CString(", ") + C12 + CString("; ") + C21 + CString(", ") + C22 + CString("] ");
-	MessageBox(M , _T("The answer"));
+	auto request = BuildRequest(matrixcore::MatrixOperation::Subtract, a11, a12, a21, a22, b11, b12, b21, b22);
+	auto response = matrixcore::Execute(request);
+	if (!response.ok) {
+		MessageBox(BuildErrorMessage(response), _T("The answer"));
+		return;
+	}
+
+	MessageBox(BuildMatrixMessage(response.matrix), _T("The answer"));
 	UpdateData(FALSE);
 }
 
 
 void Matrix_Cal::OnBnClickedButton13()
 {
-	// TODO: 在此添加控件通知处理程序代码
 	UpdateData(TRUE);
-	double A11 = atof(a11);
-	double A12 = atof(a12);
-	double A21 = atof(a21);
-	double A22 = atof(a22);
-	double B11 = atof(b11);
-	double B12 = atof(b12);
-	double B22 = atof(b22);
-	double B21 = atof(b21);
-	CString M("结果：新矩阵1：[");
-	M += a11 + CString(", ") + a21 + CString("; ") + a12 + CString(", ") + a22 + CString("] ")+ CString(";  新矩阵2：[ ")+b11 + CString(", ") + b21 + CString("; ") + b12 + CString(", ") + b22 + CString("] ");
+	auto leftRequest = BuildRequest(matrixcore::MatrixOperation::TransposeLeft, a11, a12, a21, a22, b11, b12, b21, b22);
+	auto rightRequest = BuildRequest(matrixcore::MatrixOperation::TransposeRight, a11, a12, a21, a22, b11, b12, b21, b22);
+	auto leftResponse = matrixcore::Execute(leftRequest);
+	auto rightResponse = matrixcore::Execute(rightRequest);
+
+	if (!leftResponse.ok) {
+		MessageBox(BuildErrorMessage(leftResponse), _T("The answer"));
+		return;
+	}
+
+	if (!rightResponse.ok) {
+		MessageBox(BuildErrorMessage(rightResponse), _T("The answer"));
+		return;
+	}
+
+	CString M(_T("结果：新矩阵1：[") );
+	CString left11;
+	CString left12;
+	CString left21;
+	CString left22;
+	CString right11;
+	CString right12;
+	CString right21;
+	CString right22;
+	left11.Format(_T("%.4f"), leftResponse.matrix.m11);
+	left12.Format(_T("%.4f"), leftResponse.matrix.m12);
+	left21.Format(_T("%.4f"), leftResponse.matrix.m21);
+	left22.Format(_T("%.4f"), leftResponse.matrix.m22);
+	right11.Format(_T("%.4f"), rightResponse.matrix.m11);
+	right12.Format(_T("%.4f"), rightResponse.matrix.m12);
+	right21.Format(_T("%.4f"), rightResponse.matrix.m21);
+	right22.Format(_T("%.4f"), rightResponse.matrix.m22);
+
+	M += left11 + CString(_T(", ")) + left12 + CString(_T("; ")) + left21 + CString(_T(", ")) + left22 + CString(_T("] "));
+	M += CString(_T(";  新矩阵2：[ "));
+	M += right11 + CString(_T(", ")) + right12 + CString(_T("; ")) + right21 + CString(_T(", ")) + right22 + CString(_T("] "));
 	MessageBox(M, _T("The answer"));
 	UpdateData(FALSE);
 }
@@ -163,91 +220,59 @@ void Matrix_Cal::OnBnClickedButton13()
 
 void Matrix_Cal::OnBnClickedButton9()
 {
-	// TODO: 在此添加控件通知处理程序代码
 	UpdateData(TRUE);
-	double A11 = atof(a11);
-	double A12 = atof(a12);
-	double A21 = atof(a21);
-	double A22 = atof(a22);
-	double B11 = atof(b11);
-	double B12 = atof(b12);
-	double B22 = atof(b22);
-	double B21 = atof(b21);
-	CString M("结果:");
-	CString x;
-	double xx = A11 * A22 - A21 * A12;
-	x.Format(_T("%.4f"), xx);
-	M += x;
-	MessageBox(M, _T("The answer"));
+	auto request = BuildRequest(matrixcore::MatrixOperation::DeterminantLeft, a11, a12, a21, a22, b11, b12, b21, b22);
+	auto response = matrixcore::Execute(request);
+	if (!response.ok) {
+		MessageBox(BuildErrorMessage(response), _T("The answer"));
+		return;
+	}
+
+	MessageBox(BuildScalarMessage(response.scalar), _T("The answer"));
 	UpdateData(FALSE);
 }
 
 
 void Matrix_Cal::OnBnClickedButton10()
 {
-	// TODO: 在此添加控件通知处理程序代码
 	UpdateData(TRUE);
-	double A11 = atof(a11);
-	double A12 = atof(a12);
-	double A21 = atof(a21);
-	double A22 = atof(a22);
-	double B11 = atof(b11);
-	double B12 = atof(b12);
-	double B22 = atof(b22);
-	double B21 = atof(b21);
-	CString M("结果:");
-	CString x;
-	double xx = B11 * B22 - B21 * B12;
-	x.Format(_T("%.4f"), xx);
-	M += x;
-	MessageBox(M, _T("The answer"));
+	auto request = BuildRequest(matrixcore::MatrixOperation::DeterminantRight, a11, a12, a21, a22, b11, b12, b21, b22);
+	auto response = matrixcore::Execute(request);
+	if (!response.ok) {
+		MessageBox(BuildErrorMessage(response), _T("The answer"));
+		return;
+	}
+
+	MessageBox(BuildScalarMessage(response.scalar), _T("The answer"));
 	UpdateData(FALSE);
 }
 
 
 void Matrix_Cal::OnBnClickedButton11()
 {
-	// TODO: 在此添加控件通知处理程序代码
 	UpdateData(TRUE);
-	double A11 = atof(a11);
-	double A12 = atof(a12);
-	double A21 = atof(a21);
-	double A22 = atof(a22);
-	double B11 = atof(b11);
-	double B12 = atof(b12);
-	double B22 = atof(b22);
-	double B21 = atof(b21);
-	CString M("结果:");
-	CString x;
-	double xx = A11 * A22 - A21 * A12;
-	if (xx != 0)x.Format(_T("%d"), 2);
-	else if (xx == 0 && A11 == 0 && A12 == 0 && A21 == 0 && A22 == 0)x.Format(_T("%d"), 0);
-	else x.Format(_T("%d"), 1);
-	M += x;
-	MessageBox(M, _T("The answer"));
+	auto request = BuildRequest(matrixcore::MatrixOperation::RankLeft, a11, a12, a21, a22, b11, b12, b21, b22);
+	auto response = matrixcore::Execute(request);
+	if (!response.ok) {
+		MessageBox(BuildErrorMessage(response), _T("The answer"));
+		return;
+	}
+
+	MessageBox(BuildRankMessage(response.rank), _T("The answer"));
 	UpdateData(FALSE);
 }
 
 
 void Matrix_Cal::OnBnClickedButton12()
 {
-	// TODO: 在此添加控件通知处理程序代码
 	UpdateData(TRUE);
-	double A11 = atof(a11);
-	double A12 = atof(a12);
-	double A21 = atof(a21);
-	double A22 = atof(a22);
-	double B11 = atof(b11);
-	double B12 = atof(b12);
-	double B22 = atof(b22);
-	double B21 = atof(b21);
-	CString M("结果:");
-	CString x;
-	double xx = B11 * B22 - B21 * B12;
-	if (xx!=0)x.Format(_T("%d"), 2);
-	else if (xx == 0 && B11 == 0 && B12 == 0 && B21 == 0 && B22 == 0)x.Format(_T("%d"), 0);
-	else x.Format(_T("%d"), 1);
-	M += x;
-	MessageBox(M, _T("The answer"));
+	auto request = BuildRequest(matrixcore::MatrixOperation::RankRight, a11, a12, a21, a22, b11, b12, b21, b22);
+	auto response = matrixcore::Execute(request);
+	if (!response.ok) {
+		MessageBox(BuildErrorMessage(response), _T("The answer"));
+		return;
+	}
+
+	MessageBox(BuildRankMessage(response.rank), _T("The answer"));
 	UpdateData(FALSE);
 }

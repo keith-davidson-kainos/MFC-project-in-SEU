@@ -195,6 +195,7 @@
     <ClInclude Include="framework.h" />
     <ClInclude Include="integration.h" />
     <ClInclude Include="Leisure.h" />
+    <ClInclude Include="MatrixCore\MatrixCore.h" />
     <ClInclude Include="linear.h" />
     <ClInclude Include="Matrix_Cal.h" />
     <ClInclude Include="multiple_equations.h" />
@@ -217,6 +218,7 @@
     <ClCompile Include="integration.cpp" />
     <ClCompile Include="Leisure.cpp" />
     <ClCompile Include="linear.cpp" />
+    <ClCompile Include="MatrixCore\MatrixCore.cpp" />
     <ClCompile Include="Matrix_Cal.cpp" />
     <ClCompile Include="multiple_equations.cpp" />
     <ClCompile Include="pch.cpp">

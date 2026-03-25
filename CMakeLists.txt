@@ -8,12 +8,22 @@ add_library(DateConversionCore STATIC
     scr/DateConversionCore/DateConversionCore.cpp
 )
 
+add_library(MatrixCore STATIC
+    scr/MatrixCore/MatrixCore.cpp
+)
+
 target_include_directories(DateConversionCore
     PUBLIC
         ${CMAKE_CURRENT_SOURCE_DIR}/scr/DateConversionCore
 )
 
+target_include_directories(MatrixCore
+    PUBLIC
+        ${CMAKE_CURRENT_SOURCE_DIR}/scr/MatrixCore
+)
+
 target_compile_features(DateConversionCore PUBLIC cxx_std_17)
+target_compile_features(MatrixCore PUBLIC cxx_std_17)
 
 if(BUILD_DATECONV_TESTS)
     include(CTest)
@@ -36,6 +46,7 @@ if(BUILD_DATECONV_TESTS)
     add_executable(DateConversionCoreTests
         tests/Calculate_atom.Tests/main.cpp
         tests/Calculate_atom.Tests/DateConversionCoreTests.cpp
+        tests/Calculate_atom.Tests/MatrixCoreTests.cpp
         tests/Calculate_atom.Tests/pch.cpp
     )
 
@@ -47,6 +58,7 @@ if(BUILD_DATECONV_TESTS)
     target_link_libraries(DateConversionCoreTests
         PRIVATE
             DateConversionCore
+            MatrixCore
     )
 
     if(TARGET GTest::gtest)

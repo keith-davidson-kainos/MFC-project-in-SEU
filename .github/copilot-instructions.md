@@ -18,7 +18,22 @@
   - Open `scr/Calculate_atom.sln` in Visual Studio and build `Debug|Win32`, `Debug|x64`, `Release|Win32`, or `Release|x64`.
   - Or use MSBuild on Windows for scripted builds, for example: `msbuild scr/Calculate_atom.sln /p:Configuration=Debug /p:Platform=x64`
 - Do not assume the project can be built or run on macOS or Linux. MFC, Windows resources, and the Visual Studio project format are Windows-specific.
-- No automated test suite is present in this repository. When changing behavior, prefer small targeted code changes and explain what should be verified manually in the affected dialog.
+
+## Tests Directory And Unit Testing Approach
+- Automated unit tests live under `tests/Calculate_atom.Tests/` and are built by the root `CMakeLists.txt` into the `DateConversionCoreTests` executable.
+- Keep test code portable and independent of MFC UI types. Put computation and parsing logic into plain C++ modules (for example under `scr/DateConversionCore/` or `scr/MatrixCore/`) and test those modules directly.
+- Add one `*Tests.cpp` file per module/feature in `tests/Calculate_atom.Tests/`, include `pch.h`, and register cases with GoogleTest.
+- Unit tests should cover:
+  - Public function behavior and key branches.
+  - Error handling for invalid, null, empty, and out-of-range inputs where applicable.
+  - Boundary conditions and representative numeric edge cases.
+- Prefer deterministic assertions (`EXPECT_EQ`, `EXPECT_NEAR`) with explicit expected values; avoid UI-level automation in this test target.
+- Run the test workflow from repository root:
+  - `cmake -S . -B build`
+  - `cmake --build build`
+  - `ctest --test-dir build --output-on-failure`
+- When introducing a new testable core module, wire both production and test files in `CMakeLists.txt`; if the module is also used by the MFC app, add corresponding entries to `scr/Calculate_atom.vcxproj` and `scr/Calculate_atom.vcxproj.filters`.
+- For MFC dialog changes that remain UI-only, document manual verification steps in the PR/summary even when unit tests are not applicable.
 
 ## Conventions
 - Many dialogs are created lazily with `GetSafeHwnd()` checks and `Create(MAKEINTRESOURCE(...))` before `ShowWindow(1)`. Keep that pattern when adding dialog-launch behavior.
