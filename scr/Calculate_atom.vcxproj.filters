@@ -51,6 +51,9 @@
     <ClInclude Include="Complex_cal.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="DateConversionCore\DateConversionCore.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
     <ClInclude Include="Matrix_Cal.h">
       <Filter>头文件</Filter>
     </ClInclude>
@@ -99,6 +102,9 @@
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="Complex_cal.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="DateConversionCore\DateConversionCore.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="Matrix_Cal.cpp">

@@ -22,7 +22,6 @@ protected:
 	DECLARE_MESSAGE_MAP()
 public:
 	afx_msg void OnBnClickedButton2();
-	bool IsLeapYear(int year);
 	CString y1;
 	CString m1;
 	CString d1;

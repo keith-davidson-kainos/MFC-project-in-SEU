@@ -1,0 +1,7 @@
+{
+  "name": "mfc-project-in-seu",
+  "version-string": "0.1.0",
+  "dependencies": [
+    "gtest"
+  ]
+}

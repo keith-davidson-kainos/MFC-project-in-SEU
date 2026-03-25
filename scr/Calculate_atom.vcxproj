@@ -189,6 +189,7 @@
     <ClInclude Include="Calculate_molecule.h" />
     <ClInclude Include="CLoginDlg.h" />
     <ClInclude Include="Complex_cal.h" />
+    <ClInclude Include="DateConversionCore\DateConversionCore.h" />
     <ClInclude Include="Date_Conversion.h" />
     <ClInclude Include="Draw_dlg.h" />
     <ClInclude Include="framework.h" />
@@ -210,6 +211,7 @@
     <ClCompile Include="Calculate_molecule.cpp" />
     <ClCompile Include="CLoginDlg.cpp" />
     <ClCompile Include="Complex_cal.cpp" />
+    <ClCompile Include="DateConversionCore\DateConversionCore.cpp" />
     <ClCompile Include="Date_Conversion.cpp" />
     <ClCompile Include="Draw_dlg.cpp" />
     <ClCompile Include="integration.cpp" />

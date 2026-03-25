@@ -1,0 +1,118 @@
+# =============================================================================
+# C++ / Visual Studio / MFC project — .gitignore
+# =============================================================================
+
+# -----------------------------------------------------------------------------
+# CMake build directories (macOS / cross-platform builds)
+# -----------------------------------------------------------------------------
+build/
+build-coverage/
+out/
+cmake-build-*/
+
+# -----------------------------------------------------------------------------
+# Visual Studio build output
+# -----------------------------------------------------------------------------
+[Dd]ebug/
+[Rr]elease/
+x64/
+x86/
+[Ww]in32/
+[Aa][Rr][Mm]/
+[Aa][Rr][Mm]64/
+bld/
+[Bb]in/
+[Oo]bj/
+[Ll]og/
+[Ll]ogs/
+
+# -----------------------------------------------------------------------------
+# Visual Studio files
+# -----------------------------------------------------------------------------
+*.VC.db
+*.VC.VC.opendb
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+*.ncb
+*.sdf
+*.opensdf
+*.cachefile
+*.aps
+.vs/
+ipch/
+
+# Incremental link files
+*.ilk
+
+# Precompiled headers
+*.pch
+*.gch
+
+# Compiled object files
+*.obj
+*.o
+
+# Static and dynamic libraries
+*.lib
+*.a
+*.la
+*.lo
+*.dll
+*.so
+*.dylib
+*.exp
+
+# Executables
+*.exe
+*.out
+
+# Program database (debug symbols)
+*.pdb
+*.idb
+
+# Manifest files (auto-generated)
+*.manifest
+
+# Resource compiler output
+*.res
+
+# -----------------------------------------------------------------------------
+# Test output
+# -----------------------------------------------------------------------------
+Testing/
+CTestTestfile.cmake
+LastTest.log
+test_detail.xml
+*.gcda
+*.gcno
+*.gcov
+coverage.info
+coverage/
+
+# -----------------------------------------------------------------------------
+# Dependency / package manager artefacts
+# -----------------------------------------------------------------------------
+vcpkg_installed/
+packages/
+
+# -----------------------------------------------------------------------------
+# macOS artefacts
+# -----------------------------------------------------------------------------
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+.Spotlight-V100
+.Trashes
+
+# -----------------------------------------------------------------------------
+# Editor / IDE artefacts
+# -----------------------------------------------------------------------------
+.vscode/
+!.vscode/settings.json
+!.vscode/extensions.json
+*.swp
+*.swo
+*~
