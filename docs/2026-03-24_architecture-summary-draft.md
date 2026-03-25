@@ -120,3 +120,70 @@ Use this standalone Mermaid file for previewing and future edits.
 - Current system is Windows-only due to MFC and resource/toolchain dependencies.
 - Architecture is monolithic desktop UI with in-process computation modules.
 - No service decomposition, network API layer, or persistence layer is currently present.
+
+## SBOM-Based Dependency Upgrade Shortlist And Ordering
+
+### High-Value Upgrade Candidates (2-3)
+
+| Priority | Dependency Candidate | Current State (SBOM) | Why High-Value |
+|---|---|---|---|
+| 1 | MSVC/MFC toolchain stack (v142 -> v143) | Visual Studio 2019 toolset + MFC 14.2 family | Current toolchain is past lifecycle support; highest risk reduction and unlocks supported compiler/runtime servicing. |
+| 2 | CRT runtime alignment (`msvcr120.dll` -> `vcruntime140*.dll`/UCRT) | SBOM flags `msvcr120.dll` mismatch against v142 expectations | Eliminates runtime mismatch risk and reduces ABI inconsistency across modules. |
+| 3 | Windows platform baseline + SDK (Windows 10 legacy baseline -> supported Windows 11/modern Windows 10 build policy) | SBOM/risk notes indicate Windows 10 22H2 lifecycle has ended | Reduces platform EOL exposure and aligns deployment policy with supported OS patch channels. |
+
+### Impact Analysis By Candidate
+
+#### 1) MSVC/MFC toolchain stack (v142 -> v143)
+
+- Breaking API changes (practical):
+	- Compiler conformance and diagnostics are stricter in newer MSVC toolsets; legacy code patterns that compiled under older defaults may fail or warn-as-error.
+	- Mixed-toolset binary coupling risk: modules built with older toolset/runtime should not be mixed arbitrarily with newly rebuilt binaries.
+- Deprecated features removed:
+	- Legacy/obsolete CRT assumptions tied to old redistributables are no longer a safe baseline for a supported toolchain posture.
+	- Existing deprecated numeric-conversion usage in code (`atof`, `_itoa_s` hotspots) becomes higher-risk under modern hardening goals.
+- Minimum runtime/platform requirement:
+	- Build environment must move to a supported Visual Studio toolchain generation (VS2022 class).
+	- Deployment should standardize on the corresponding Microsoft Visual C++ 2015-2022 runtime family.
+
+#### 2) CRT runtime alignment (`msvcr120.dll` -> `vcruntime140*.dll`/UCRT)
+
+- Breaking API changes (practical):
+	- ABI/runtime boundary changes mean all native modules should be rebuilt consistently against the same CRT family.
+	- Passing CRT-owned resources (allocation/file handles/locale state) across mixed CRT boundaries is unsafe and can cause defects.
+- Deprecated features removed:
+	- Reliance on VS2013-era CRT deployment (`msvcr120`) should be treated as legacy and removed from linker/deployment assumptions.
+- Minimum runtime/platform requirement:
+	- Requires packaging/installing the modern VC++ redistributable family used by the retargeted build.
+	- Keep project runtime support policy at Windows 10/11 (or stricter) to avoid unsupported legacy combinations.
+
+#### 3) Windows platform baseline + SDK policy refresh
+
+- Breaking API changes (practical):
+	- Raising minimum supported OS/version policy can intentionally drop very old Windows builds from support matrix.
+	- Any legacy behavior relying on older shell/runtime quirks must be re-verified under modern platform defaults.
+- Deprecated features removed:
+	- EOL Windows servicing baseline (notably older Windows 10 channels) should be removed from deployment target matrix.
+- Minimum runtime/platform requirement:
+	- Define and document supported OS matrix explicitly (recommended: fully supported Windows 11 and supported Windows 10 channels only).
+	- Align SDK selection and CI build images with that support matrix.
+
+### Dependency Graph And Upgrade Ordering
+
+#### Runtime Dependency Graph (simplified)
+
+1. Application modules (`Calculate_atom.exe` + dialogs) depend on MFC runtime/toolset outputs.
+2. MFC runtime/toolset outputs depend on a consistent CRT/UCRT family.
+3. CRT/UCRT and MFC runtime ultimately depend on Windows OS APIs and supported platform baseline.
+
+#### Ordered Upgrade Path (what must happen first)
+
+1. Establish supported platform policy and SDK baseline (supported Windows build matrix).
+2. Retarget toolchain from VS2019/v142 to VS2022/v143 with full solution rebuild.
+3. Align CRT linkage/deployment to one modern runtime family (`vcruntime140*`/UCRT); remove `msvcr120` assumptions.
+4. Re-validate MFC/UI modules and external launch paths (`ShellExecute`) under the new runtime + platform matrix.
+
+Upgrade dependency constraints:
+
+- Upgrading toolchain (step 2) requires platform/SDK decision (step 1) to avoid retarget churn.
+- Upgrading CRT alignment (step 3) depends on toolchain retarget completion (step 2), because linker/runtime family is toolchain-driven.
+- Functional verification (step 4) depends on steps 2 and 3 being complete to test real production-like binaries.
